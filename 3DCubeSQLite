@@ -1,0 +1,31 @@
+import numpy as np
+import sqlite3
+
+# Определение размерности куба
+cube_size = 10
+
+# Создание базы данных и подключение к ней
+conn = sqlite3.connect('3d_cube.db')
+c = conn.cursor()
+
+# Создание таблицы для хранения данных куба
+c.execute('''CREATE TABLE IF NOT EXISTS cube_data (
+                x INTEGER,
+                y INTEGER,
+                z INTEGER,
+                value REAL,
+                UNIQUE (x, y, z)
+             )''')
+
+# Заполнение таблицы значениями нейронной модели
+# Для примера используем случайные значения
+values = np.random.rand(cube_size, cube_size, cube_size)
+for x in range(cube_size):
+    for y in range(cube_size):
+        for z in range(cube_size):
+            c.execute("INSERT INTO cube_data (x, y, z, value) VALUES (?, ?, ?, ?)",
+                      (x + 1, y + 1, z + 1, values[x][y][z]))
+
+# Сохранение изменений и закрытие соединения с базой данных
+conn.commit()
+conn.close()
